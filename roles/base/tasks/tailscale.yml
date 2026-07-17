@@ -1,24 +1,8 @@
 ---
-- name: Install tailscale via official repo
-  block:
-    - name: Add tailscale apt keyring
-      ansible.builtin.get_url:
-        url: https://pkgs.tailscale.com/stable/debian/trixie.noarmor.gpg
-        dest: /etc/apt/keyrings/tailscale-archive-keyring.gpg
-        mode: "0644"
-        force: false
-
-    - name: Add tailscale apt repository
-      ansible.builtin.get_url:
-        url: https://pkgs.tailscale.com/stable/debian/trixie.tailscale-keyring.list
-        dest: /etc/apt/sources.list.d/tailscale.list
-        mode: "0644"
-
-    - name: Install tailscale
-      ansible.builtin.apt:
-        name: tailscale
-        state: present
-        update_cache: true
+- name: Install tailscale via official install script
+  ansible.builtin.shell:
+    cmd: curl -fsSL https://tailscale.com/install.sh | sh
+    creates: /usr/bin/tailscale
 
 - name: Ensure tailscaled is running
   ansible.builtin.systemd:

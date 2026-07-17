@@ -7,7 +7,15 @@
 
 - name: "Create pool {{ pool.name }}"
   ansible.builtin.command: >-
-    zpool create -f {{ pool.name }}
+    zpool create -f
+    -o ashift={{ pool.ashift | default(12) }}
+    -o autotrim={{ pool.autotrim | default('on') }}
+    -O compression={{ pool.compression | default('lz4') }}
+    -O atime=off
+    -O xattr=sa
+    -O acltype=posixacl
+    -O mountpoint={{ pool.mountpoint | default('/' + pool.name) }}
+    {{ pool.name }}
     {{ pool.type | default('') }}
     {{ pool.devices | join(' ') }}
     {% if pool.cache | default([]) | length > 0 %}cache {{ pool.cache | join(' ') }}{% endif %}

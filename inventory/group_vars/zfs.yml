@@ -3,6 +3,10 @@
 # ARC is left at ZFS defaults: uses up to ~50% of RAM, reclaimed by the kernel
 # under memory pressure. No tuning needed.
 #
+# Pool-level best practices are applied at creation by the role:
+#   ashift=12 (4K sectors, IMMUTABLE), autotrim=on, compression=lz4,
+#   atime=off, xattr=sa, acltype=posixacl, mountpoint=/tank
+#
 # Drives are hardcoded by stable /dev/disk/by-id/ paths.
 #   raidz1: 4x ST3000VN000 3TB HDDs (sda-sdd)
 #   cache : 1x Intel SSDSC2CT060A3 60GB SSD (sde), L2ARC
@@ -10,6 +14,9 @@
 zfs_pools:
   - name: tank
     type: raidz1
+    ashift: 12
+    autotrim: "on"
+    compression: lz4
     devices:
       - /dev/disk/by-id/ata-ST3000VN000-1HJ166_W6A1CTJM
       - /dev/disk/by-id/ata-ST3000VN000-1HJ166_W6A1CTA9
@@ -18,7 +25,63 @@ zfs_pools:
     cache:
       - /dev/disk/by-id/ata-INTEL_SSDSC2CT060A3_CVMP218502EF060AGN
     datasets:
+      # media, app, data, backup child datasets inherit the pool-level
+      # compression/atime/xattr settings above; only overrides are listed.
+
+      # ================= media: bulk, replaceable, no snapshots =============
+      # Big files, often already compressed. Large recordsize for throughput.
+      - name: tank/media
+        options:
+          compression: "off"
+          recordsize: 1M
+      - name: tank/media/video
+      - name: tank/media/music
+      - name: tank/media/books
+      - name: tank/media/downloads
+
+      # ================= app: per-app config/state (precious, small) ========
+      # Snapshot-worthy, compresses well.
+      - name: tank/app
+        options:
+          compression: lz4
+      # These apps keep an embedded SQLite DB in their config dir; a small
+      # recordsize matches SQLite's page size and avoids write amplification.
+      - name: tank/app/jellyfin
+        options:
+          recordsize: 16K
+      - name: tank/app/arr
+        options:
+          recordsize: 16K
+      - name: tank/app/seerr
+        options:
+          recordsize: 16K
+      - name: tank/app/qbittorrent
+      - name: tank/app/shelfmark
+      - name: tank/app/grimmory
+      - name: tank/app/nextcloud
+      - name: tank/app/immich
+      - name: tank/app/minecraft
+      - name: tank/app/gameserver
+      - name: tank/app/web
+      - name: tank/app/cloudflared
+      - name: tank/app/authelia
+      - name: tank/app/lldap
+
+      # ================= data: irreplaceable user data ======================
       - name: tank/data
         options:
           compression: lz4
-          mountpoint: /data
+      - name: tank/data/nextcloud
+      - name: tank/data/immich
+
+      # ================= backup: db dumps pulled from the boot SSD ===========
+      # Databases live on the boot SSD; nightly dumps land here. zstd = better
+      # ratio for text dumps; keep history via snapshots.
+      - name: tank/backup
+        options:
+          compression: zstd
+      - name: tank/backup/db
+      - name: tank/backup/db/nextcloud
+      - name: tank/backup/db/immich
+      - name: tank/backup/db/lldap
+      - name: tank/backup/db/authelia

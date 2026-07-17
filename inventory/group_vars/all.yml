@@ -12,7 +12,7 @@ admin_ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICXTiYyDMr36/5P304B5HhOi2bkW
 #   export TS_AUTHKEY=tskey-auth-xxxx
 tailscale_authkey: "{{ lookup('env', 'TS_AUTHKEY') }}"
 # Extra flags passed to `tailscale up`, e.g. "--ssh --accept-routes"
-tailscale_up_args: ""
+tailscale_up_args: "--ssh"
 
 # --- Base packages ------------------------------------------------------------
 # Chosen from the recommendation list. Networking left at Debian defaults.

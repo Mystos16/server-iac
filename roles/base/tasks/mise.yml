@@ -1,11 +1,16 @@
 ---
 # Install mise-en-place system-wide from the official apt repo.
-- name: Add mise apt keyring
+- name: Download mise gpg key (ASCII armored)
   ansible.builtin.get_url:
     url: https://mise.jdx.dev/gpg-key.pub
-    dest: /etc/apt/keyrings/mise-archive-keyring.gpg
+    dest: /etc/apt/keyrings/mise.asc
     mode: "0644"
     force: false
+
+- name: Dearmor mise gpg key
+  ansible.builtin.command:
+    cmd: gpg --dearmor --yes -o /etc/apt/keyrings/mise-archive-keyring.gpg /etc/apt/keyrings/mise.asc
+    creates: /etc/apt/keyrings/mise-archive-keyring.gpg
 
 - name: Add mise apt repository
   ansible.builtin.deb822_repository:

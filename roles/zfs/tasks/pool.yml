@@ -1,0 +1,33 @@
+---
+- name: "Check if pool {{ pool.name }} exists"
+  ansible.builtin.command: "zpool list {{ pool.name }}"
+  register: zpool_check
+  changed_when: false
+  failed_when: false
+
+- name: "Create pool {{ pool.name }}"
+  ansible.builtin.command: >-
+    zpool create -f {{ pool.name }}
+    {{ pool.type | default('') }}
+    {{ pool.devices | join(' ') }}
+    {% if pool.cache | default([]) | length > 0 %}cache {{ pool.cache | join(' ') }}{% endif %}
+  when: zpool_check.rc != 0
+  changed_when: true
+
+- name: "Ensure cache (L2ARC) devices on {{ pool.name }}"
+  ansible.builtin.command: "zpool add {{ pool.name }} cache {{ item }}"
+  loop: "{{ pool.cache | default([]) }}"
+  register: zpool_cache_add
+  changed_when: "'invalid vdev specification' not in (zpool_cache_add.stderr | default(''))"
+  failed_when:
+    - zpool_cache_add.rc != 0
+    - "'is in use' not in (zpool_cache_add.stderr | default(''))"
+    - "'already in use' not in (zpool_cache_add.stderr | default(''))"
+  when: zpool_check.rc == 0
+
+- name: "Create datasets on {{ pool.name }}"
+  community.general.zfs:
+    name: "{{ item.name }}"
+    state: present
+    extra_zfs_properties: "{{ item.options | default({}) }}"
+  loop: "{{ pool.datasets | default([]) }}"

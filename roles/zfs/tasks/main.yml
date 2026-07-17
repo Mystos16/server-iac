@@ -1,0 +1,42 @@
+---
+- name: Install ZFS prerequisites
+  ansible.builtin.apt:
+    name:
+      - dpkg-dev
+      - "linux-headers-{{ ansible_kernel }}"
+    state: present
+    update_cache: true
+
+- name: Enable contrib component for zfs packages
+  ansible.builtin.apt_repository:
+    repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }} main contrib"
+    state: present
+    filename: debian-contrib
+
+- name: Install zfs-dkms and utils
+  ansible.builtin.apt:
+    name:
+      - zfs-dkms
+      - zfsutils-linux
+    state: present
+    update_cache: true
+
+- name: Load zfs kernel module
+  community.general.modprobe:
+    name: zfs
+    state: present
+
+- name: Ensure zfs module loads at boot
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/zfs.conf
+    content: "zfs\n"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Create ZFS pools
+  ansible.builtin.include_tasks: pool.yml
+  loop: "{{ zfs_pools }}"
+  loop_control:
+    loop_var: pool
+  when: zfs_pools | length > 0

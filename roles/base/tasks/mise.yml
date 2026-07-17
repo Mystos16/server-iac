@@ -1,0 +1,20 @@
+---
+# Install mise-en-place system-wide from the official apt repo.
+- name: Add mise apt keyring
+  ansible.builtin.get_url:
+    url: https://mise.jdx.dev/gpg-key.pub
+    dest: /etc/apt/keyrings/mise-archive-keyring.gpg
+    mode: "0644"
+    force: false
+
+- name: Add mise apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main"
+    filename: mise
+    state: present
+
+- name: Install mise
+  ansible.builtin.apt:
+    name: mise
+    state: present
+    update_cache: true

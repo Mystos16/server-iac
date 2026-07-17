@@ -1,0 +1,22 @@
+---
+# HAProxy role defaults. Runs on a separate machine.
+haproxy_stats_enabled: true
+haproxy_stats_port: 8404
+haproxy_stats_user: "admin"
+haproxy_stats_password: "{{ lookup('env', 'HAPROXY_STATS_PASSWORD') | default('changeme', true) }}"
+
+# Frontends/backends to render into haproxy.cfg.
+haproxy_frontends: []
+# Example:
+# haproxy_frontends:
+#   - name: http_in
+#     bind: "*:80"
+#     default_backend: web
+# haproxy_backends:
+#   - name: web
+#     balance: roundrobin
+#     servers:
+#       - name: server01
+#         address: "100.64.0.1:80"
+#         options: "check"
+haproxy_backends: []

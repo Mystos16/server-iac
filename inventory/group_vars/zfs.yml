@@ -1,0 +1,24 @@
+---
+# ZFS config for kingkiller (single Debian host).
+# ARC is left at ZFS defaults: uses up to ~50% of RAM, reclaimed by the kernel
+# under memory pressure. No tuning needed.
+#
+# Drives are hardcoded by stable /dev/disk/by-id/ paths.
+#   raidz1: 4x ST3000VN000 3TB HDDs (sda-sdd)
+#   cache : 1x Intel SSDSC2CT060A3 60GB SSD (sde), L2ARC
+# NOTE: sdf (Samsung 840 EVO) is the OS/LVM disk and is deliberately excluded.
+zfs_pools:
+  - name: tank
+    type: raidz1
+    devices:
+      - /dev/disk/by-id/ata-ST3000VN000-1HJ166_W6A1CTJM
+      - /dev/disk/by-id/ata-ST3000VN000-1HJ166_W6A1CTA9
+      - /dev/disk/by-id/ata-ST3000VN000-1HJ166_W6A1CTVW
+      - /dev/disk/by-id/ata-ST3000VN000-1HJ166_W6A1D16L
+    cache:
+      - /dev/disk/by-id/ata-INTEL_SSDSC2CT060A3_CVMP218502EF060AGN
+    datasets:
+      - name: tank/data
+        options:
+          compression: lz4
+          mountpoint: /data

@@ -1,0 +1,40 @@
+[tools]
+python = "3.12"
+
+[env]
+ANSIBLE_CONFIG = "{{ config_root }}/ansible.cfg"
+
+[tasks.setup]
+description = "Install Ansible and Galaxy dependencies"
+run = [
+  "pip install --upgrade ansible",
+  "ansible-galaxy collection install -r requirements.yml",
+]
+
+[tasks.ping]
+description = "Check SSH connectivity to all hosts"
+run = "ansible all -m ping"
+
+[tasks.site]
+description = "Run the full site playbook (all tiers)"
+run = "ansible-playbook playbooks/site.yml"
+
+[tasks.base]
+description = "Run the base role on all hosts"
+run = "ansible-playbook playbooks/base.yml"
+
+[tasks.zfs]
+description = "Run the zfs role"
+run = "ansible-playbook playbooks/zfs.yml"
+
+[tasks.k3s]
+description = "Run the k3s role"
+run = "ansible-playbook playbooks/k3s.yml"
+
+[tasks.haproxy]
+description = "Run the haproxy role"
+run = "ansible-playbook playbooks/haproxy.yml"
+
+[tasks.upgrade]
+description = "Full apt dist-upgrade on all hosts"
+run = "ansible-playbook playbooks/upgrade.yml"

@@ -1,0 +1,5 @@
+*.retry
+.env
+__pycache__/
+*.pyc
+/collections/

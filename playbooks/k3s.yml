@@ -1,0 +1,7 @@
+---
+# Tier 2 — k3s single node.
+- name: k3s
+  hosts: k3s
+  become: true
+  roles:
+    - k3s

@@ -1,0 +1,6 @@
+---
+haproxy_stats_enabled: true
+haproxy_stats_port: 8404
+haproxy_stats_user: "admin"
+haproxy_frontends: []
+haproxy_backends: []

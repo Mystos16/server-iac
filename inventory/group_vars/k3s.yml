@@ -1,0 +1,6 @@
+---
+# k3s single-node defaults.
+# Uses the default k3s install script; no extra config.
+k3s_install_url: "https://get.k3s.io"
+# Extra args passed via INSTALL_K3S_EXEC (empty = full default install).
+k3s_exec_args: ""

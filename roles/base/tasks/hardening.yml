@@ -1,0 +1,28 @@
+---
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Harden SSH configuration
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/10-hardening.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Ansible (base role)
+      PermitRootLogin {{ ssh_permit_root_login }}
+      PubkeyAuthentication yes
+      # Password auth is left enabled for now. Uncomment to disable:
+      {% if ssh_password_authentication_disable %}
+      PasswordAuthentication no
+      {% else %}
+      # PasswordAuthentication no
+      {% endif %}
+      ChallengeResponseAuthentication no
+      X11Forwarding no
+      MaxAuthTries 4
+    validate: "sshd -t -f %s"
+  notify: Restart ssh

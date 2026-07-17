@@ -1,0 +1,48 @@
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000
+    timeout client  50000
+    timeout server  50000
+
+{% if haproxy_stats_enabled %}
+listen stats
+    bind *:{{ haproxy_stats_port }}
+    stats enable
+    stats uri /
+    stats refresh 10s
+    stats auth {{ haproxy_stats_user }}:{{ haproxy_stats_password }}
+{% endif %}
+
+{% for fe in haproxy_frontends %}
+frontend {{ fe.name }}
+    bind {{ fe.bind }}
+{% if fe.mode is defined %}
+    mode {{ fe.mode }}
+{% endif %}
+    default_backend {{ fe.default_backend }}
+
+{% endfor %}
+{% for be in haproxy_backends %}
+backend {{ be.name }}
+    balance {{ be.balance | default('roundrobin') }}
+{% if be.mode is defined %}
+    mode {{ be.mode }}
+{% endif %}
+{% for srv in be.servers %}
+    server {{ srv.name }} {{ srv.address }} {{ srv.options | default('check') }}
+{% endfor %}
+
+{% endfor %}

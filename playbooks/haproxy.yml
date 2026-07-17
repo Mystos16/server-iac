@@ -1,0 +1,7 @@
+---
+# Tier 2 — haproxy (separate machine).
+- name: HAProxy
+  hosts: haproxy
+  become: true
+  roles:
+    - haproxy

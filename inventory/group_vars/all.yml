@@ -1,0 +1,49 @@
+---
+# =============================================================================
+# Global defaults applied to every host.
+# =============================================================================
+
+# --- Admin user (DUMMY VALUES — fill these in) --------------------------------
+admin_user: "gijs"
+admin_ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICXTiYyDMr36/5P304B5HhOi2bkWCMgf5VizfXBerakM kingkiller-admin"
+
+# --- Tailscale ----------------------------------------------------------------
+# Auth key is read from the environment, never committed.
+tailscale_authkey: "{{ lookup('env', 'TS_AUTHKEY') }}"
+# Extra flags passed to `tailscale up`, e.g. "--ssh --accept-routes"
+tailscale_up_args: ""
+
+# --- Base packages ------------------------------------------------------------
+# Chosen from the recommendation list. Networking left at Debian defaults.
+base_packages:
+  # core
+  - curl
+  - wget
+  - ca-certificates
+  - gnupg
+  - apt-transport-https
+  - sudo
+  - htop
+  - rsync
+  - git
+  # very useful
+  - tmux
+  - jq
+  - dnsutils
+  - unzip
+  - tar
+  - lsof
+  - ncdu
+
+# --- SSH hardening ------------------------------------------------------------
+ssh_permit_root_login: "no"
+# Password auth left ON for now (commented switch below). Set to "no" to disable.
+ssh_password_authentication_disable: false
+
+# --- fail2ban -----------------------------------------------------------------
+fail2ban_bantime: "1h"
+fail2ban_findtime: "10m"
+fail2ban_maxretry: 5
+
+# --- Unattended upgrades ------------------------------------------------------
+unattended_upgrades_enabled: true

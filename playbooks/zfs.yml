@@ -1,0 +1,7 @@
+---
+# Tier 1 — storage.
+- name: ZFS storage
+  hosts: zfs
+  become: true
+  roles:
+    - zfs

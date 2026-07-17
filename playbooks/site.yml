@@ -1,0 +1,6 @@
+---
+# Top-level orchestrator. Runs the tiers in dependency order.
+- import_playbook: base.yml
+- import_playbook: zfs.yml
+- import_playbook: k3s.yml
+- import_playbook: haproxy.yml

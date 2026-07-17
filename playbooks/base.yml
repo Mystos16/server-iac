@@ -1,0 +1,7 @@
+---
+# Tier 0 — base role on every host.
+- name: Base configuration
+  hosts: all
+  become: true
+  roles:
+    - base

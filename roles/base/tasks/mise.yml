@@ -8,9 +8,14 @@
     force: false
 
 - name: Add mise apt repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main"
-    filename: mise
+  ansible.builtin.deb822_repository:
+    name: mise
+    types: deb
+    uris: https://mise.jdx.dev/deb
+    suites: stable
+    components: main
+    architectures: amd64
+    signed_by: /etc/apt/keyrings/mise-archive-keyring.gpg
     state: present
 
 - name: Install mise

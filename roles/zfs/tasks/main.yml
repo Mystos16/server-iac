@@ -8,10 +8,15 @@
     update_cache: true
 
 - name: Enable contrib component for zfs packages
-  ansible.builtin.apt_repository:
-    repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }} main contrib"
+  ansible.builtin.deb822_repository:
+    name: debian-contrib
+    types: deb
+    uris: http://deb.debian.org/debian
+    suites: "{{ ansible_distribution_release }}"
+    components:
+      - main
+      - contrib
     state: present
-    filename: debian-contrib
 
 - name: Install zfs-dkms and utils
   ansible.builtin.apt:

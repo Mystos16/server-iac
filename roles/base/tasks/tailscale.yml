@@ -26,18 +26,9 @@
     enabled: true
     state: started
 
-- name: Check tailscale connection status
-  ansible.builtin.command: tailscale status --json
-  register: ts_status
-  changed_when: false
-  failed_when: false
-
-- name: Bring tailscale up
+- name: Bring tailscale up (reconciles flags every run)
   ansible.builtin.command: >-
     tailscale up --auth-key={{ tailscale_authkey }} {{ tailscale_up_args }}
-  when:
-    - tailscale_authkey | length > 0
-    - (ts_status.stdout | default('') | length == 0) or
-      ((ts_status.stdout | from_json).BackendState | default('') != 'Running')
+  when: tailscale_authkey | length > 0
   changed_when: true
   no_log: true

@@ -5,9 +5,6 @@
 - name: Include admin user tasks
   ansible.builtin.import_tasks: user.yml
 
-- name: Include mise tasks
-  ansible.builtin.import_tasks: mise.yml
-
 - name: Include tailscale tasks
   ansible.builtin.import_tasks: tailscale.yml
 

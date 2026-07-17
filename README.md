@@ -99,8 +99,7 @@ The foundation applied to all machines. Task files live in
 |--------------------|--------------|
 | `packages.yml`     | Installs the base package set (curl, git, htop, tmux, jq, rsync, etc. — defined in `group_vars/all.yml`). |
 | `user.yml`         | Ensures my SSH public key is authorized for my existing user `gijs`. Does not create or modify users. |
-| `mise.yml`         | Installs mise-en-place system-wide from its official apt repo. |
-| `tailscale.yml`    | Installs Tailscale from its apt repo and runs `tailscale up` only if not already connected. Auth key comes from the `TS_AUTHKEY` env var. |
+| `tailscale.yml`    | Installs Tailscale from its apt repo and runs `tailscale up --ssh` (auth key from the `TS_AUTHKEY` env var). |
 | `hardening.yml`    | Drops an sshd hardening config: root login disabled, key auth on, `MaxAuthTries` lowered. Password auth is left enabled (commented switch to disable). |
 | `firewall.yml`     | Installs and enables `ufw`: default deny inbound, allow SSH and the `tailscale0` interface. |
 | `fail2ban.yml`     | Installs fail2ban and templates `jail.local` (bans SSH brute-force; ignores localhost and the Tailscale CGNAT range). |

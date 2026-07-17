@@ -37,5 +37,7 @@
     tailscale up --auth-key={{ tailscale_authkey }} {{ tailscale_up_args }}
   when:
     - tailscale_authkey | length > 0
-    - (ts_status.stdout | from_json).BackendState | default('') != 'Running'
+    - (ts_status.stdout | default('') | length == 0) or
+      ((ts_status.stdout | from_json).BackendState | default('') != 'Running')
+  changed_when: true
   no_log: true

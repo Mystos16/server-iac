@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     name:
       - dpkg-dev
-      - "linux-headers-{{ ansible_kernel }}"
+      - "linux-headers-{{ ansible_facts['kernel'] }}"
     state: present
     update_cache: true
 
@@ -12,7 +12,7 @@
     name: debian-contrib
     types: deb
     uris: http://deb.debian.org/debian
-    suites: "{{ ansible_distribution_release }}"
+    suites: "{{ ansible_facts['distribution_release'] }}"
     components:
       - main
       - contrib

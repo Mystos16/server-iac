@@ -31,7 +31,7 @@
   tasks:
     - name: Ensure headers for the running kernel are installed
       ansible.builtin.apt:
-        name: "linux-headers-{{ ansible_kernel }}"
+        name: "linux-headers-{{ ansible_facts['kernel'] }}"
         state: present
 
     - name: Rebuild zfs-dkms module for the running kernel

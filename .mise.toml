@@ -17,24 +17,24 @@ run = "ansible all -m ping"
 
 [tasks.site]
 description = "Run the full site playbook (all tiers)"
-run = "ansible-playbook playbooks/site.yml"
+run = "ansible-playbook playbooks/site.yml --ask-become-pass"
 
 [tasks.base]
 description = "Run the base role on all hosts"
-run = "ansible-playbook playbooks/base.yml"
+run = "ansible-playbook playbooks/base.yml --ask-become-pass"
 
 [tasks.zfs]
 description = "Run the zfs role"
-run = "ansible-playbook playbooks/zfs.yml"
+run = "ansible-playbook playbooks/zfs.yml --ask-become-pass"
 
 [tasks.k3s]
 description = "Run the k3s role"
-run = "ansible-playbook playbooks/k3s.yml"
+run = "ansible-playbook playbooks/k3s.yml --ask-become-pass"
 
 [tasks.haproxy]
 description = "Run the haproxy role"
-run = "ansible-playbook playbooks/haproxy.yml"
+run = "ansible-playbook playbooks/haproxy.yml --ask-become-pass"
 
 [tasks.upgrade]
 description = "Full apt dist-upgrade on all hosts"
-run = "ansible-playbook playbooks/upgrade.yml"
+run = "ansible-playbook playbooks/upgrade.yml --ask-become-pass"

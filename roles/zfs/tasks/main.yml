@@ -21,6 +21,7 @@
 - name: Install zfs-dkms and utils
   ansible.builtin.apt:
     name:
+      - dkms
       - zfs-dkms
       - zfsutils-linux
     state: present

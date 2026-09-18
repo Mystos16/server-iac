@@ -21,3 +21,55 @@
     - name: Reboot if required
       ansible.builtin.reboot:
       when: reboot_required.stat.exists
+
+# A kernel upgrade leaves zfs-dkms built only for the old kernel until it is
+# rebuilt against the new one, and the tank pool is not auto-imported unless
+# the zpool cache file is current. Reconcile both after every upgrade run.
+- name: Reconcile ZFS after upgrade
+  hosts: zfs
+  become: true
+  tasks:
+    - name: Ensure headers for the running kernel are installed
+      ansible.builtin.apt:
+        name: "linux-headers-{{ ansible_kernel }}"
+        state: present
+
+    - name: Rebuild zfs-dkms module for the running kernel
+      ansible.builtin.command: dkms autoinstall
+      register: dkms_autoinstall
+      changed_when: "'Building' in dkms_autoinstall.stdout"
+
+    - name: Load the zfs kernel module
+      community.general.modprobe:
+        name: zfs
+        state: present
+
+    - name: Check which pools are currently imported
+      ansible.builtin.command: zpool list -H -o name
+      register: imported_pools
+      changed_when: false
+
+    - name: Import zfs pools that are not currently imported
+      ansible.builtin.command: "zpool import {{ pool.name }}"
+      loop: "{{ zfs_pools }}"
+      loop_control:
+        loop_var: pool
+      when: pool.name not in imported_pools.stdout_lines
+      changed_when: true
+
+    - name: Refresh zpool cachefile so pools auto-import on next boot
+      ansible.builtin.command: "zpool set cachefile=/etc/zfs/zpool.cache {{ pool.name }}"
+      loop: "{{ zfs_pools }}"
+      loop_control:
+        loop_var: pool
+      changed_when: true
+
+    - name: Ensure zfs import/mount services are enabled
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - zfs-import.target
+        - zfs-mount.service
+        - zfs.target

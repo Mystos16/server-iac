@@ -71,6 +71,12 @@ server-iac/
 4. `roles/*` contain the actual tasks.
 5. `.mise.toml` wraps `ansible-playbook` calls so you run short commands.
 
+`upgrade.yml` also reconciles ZFS after a kernel update: it rebuilds
+`zfs-dkms` for the running kernel (`dkms autoinstall`), reloads the module,
+re-imports the `tank` pool if it isn't imported, and refreshes
+`/etc/zfs/zpool.cache` plus the `zfs-import`/`zfs-mount` services so the pool
+auto-imports on the next boot without manual intervention.
+
 ---
 
 ## Commands
@@ -83,7 +89,7 @@ mise run base       # just the base layer
 mise run zfs        # just the storage layer
 mise run k3s        # just k3s
 mise run haproxy    # just haproxy
-mise run upgrade    # full apt dist-upgrade on all hosts (reboots if required)
+mise run upgrade    # full apt dist-upgrade + zfs dkms/import reconcile (reboots if required)
 ```
 
 ---
